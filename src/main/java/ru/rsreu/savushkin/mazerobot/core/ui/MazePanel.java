@@ -181,12 +181,51 @@ public class MazePanel extends JPanel {
 
     private void drawPath(Graphics g) {
         if (currentPath != null && !currentPath.isEmpty()) {
-            g.setColor(PATH_COLOR);
+            Graphics2D g2d = (Graphics2D) g.create();
+
+            // --- 1. Настройка и отрисовка ЛИНИИ ---
+
+            // Цвет и стиль линии (маршрут)
+            g2d.setColor(PATH_COLOR);
+            // Толстая, круглая линия, чтобы было видно соединение
+            g2d.setStroke(new BasicStroke(4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+            final int HALF_CELL = CELL_SIZE / 2;
+            final int DOT_SIZE = CELL_SIZE / 3; // Размер точки приземления
+
+            // Проходим по пути, соединяя центры точек
+            for (int i = 0; i < currentPath.size() - 1; i++) {
+                Point p1 = currentPath.get(i);
+                Point p2 = currentPath.get(i + 1);
+
+                // Координаты центра первой клетки
+                int x1 = p1.getX() * CELL_SIZE + HALF_CELL;
+                int y1 = p1.getY() * CELL_SIZE + HALF_CELL;
+
+                // Координаты центра второй клетки
+                int x2 = p2.getX() * CELL_SIZE + HALF_CELL;
+                int y2 = p2.getY() * CELL_SIZE + HALF_CELL;
+
+                // Рисуем линию между точками приземления
+                g2d.drawLine(x1, y1, x2, y2);
+            }
+
+            // --- 2. Отрисовка ТОЧЕК (Приземления) ---
+
+            // Используем более темный цвет или другой цвет для выделения самих точек
+            g2d.setColor(new Color(255, 100, 0)); // Ярко-оранжевый
+
             for (Point point : currentPath) {
                 int x = point.getX() * CELL_SIZE;
                 int y = point.getY() * CELL_SIZE;
-                g.fillRect(x + 5, y + 5, CELL_SIZE - 10, CELL_SIZE - 10);
+
+                // Рисуем заполненный овал (точку) в центре клетки
+                g2d.fillOval(x + HALF_CELL - DOT_SIZE / 2,
+                        y + HALF_CELL - DOT_SIZE / 2,
+                        DOT_SIZE, DOT_SIZE);
             }
+
+            g2d.dispose();
         }
     }
 

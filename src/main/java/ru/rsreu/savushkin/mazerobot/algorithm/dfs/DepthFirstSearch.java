@@ -10,11 +10,8 @@ public class DepthFirstSearch implements PathFindingAlgorithm {
 
     @Override
     public List<Point> findPath(Maze maze, int startX, int startY, int endX, int endY) {
-        // Множество посещенных точек
         Set<Point> visited = new HashSet<>();
-        // Стек для DFS
         Deque<Point> stack = new ArrayDeque<>();
-        // Карта для восстановления пути (ребенок -> родитель)
         Map<Point, Point> parentMap = new HashMap<>();
 
         Point start = new Point(startX, startY);
@@ -24,8 +21,10 @@ public class DepthFirstSearch implements PathFindingAlgorithm {
         visited.add(start);
         parentMap.put(start, null);
 
-        // Возможные направления движения (вверх, вправо, вниз, влево)
-        int[][] directions = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
+        // Возможные направления движения: (dx, dy)
+        int[][] directions = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}}; // Вверх, Вправо, Вниз, Влево
+        // Возможные размеры шага: 1 и 2 клетки
+        int[] steps = {1, 2};
 
         while (!stack.isEmpty()) {
             Point current = stack.pop();
@@ -35,20 +34,37 @@ public class DepthFirstSearch implements PathFindingAlgorithm {
                 return reconstructPath(parentMap, current);
             }
 
-            // Проверяем всех соседей
+            // Проверяем всех соседей с учетом шага 1 и 2
             for (int[] dir : directions) {
-                int newX = current.getX() + dir[0];
-                int newY = current.getY() + dir[1];
+                int dx = dir[0];
+                int dy = dir[1];
 
-                // Проверяем, что новые координаты в пределах лабиринта
-                if (newX >= 0 && newX < maze.getWidth() && newY >= 0 && newY < maze.getHeight()) {
+                for (int step : steps) {
+                    int newX = current.getX() + dx * step;
+                    int newY = current.getY() + dy * step;
+
                     Point neighbor = new Point(newX, newY);
 
-                    // Если соседняя клетка проходима и не посещена
-                    if (maze.isPassable(newX, newY) && !visited.contains(neighbor)) {
-                        stack.push(neighbor);
-                        visited.add(neighbor);
-                        parentMap.put(neighbor, current);
+                    // 1. Проверяем, что цель находится в пределах лабиринта
+                    if (newX >= 0 && newX < maze.getWidth() && newY >= 0 && newY < maze.getHeight()) {
+
+                        // 2. Дополнительная проверка для шага в 2 клетки: промежуточная клетка должна быть проходима
+                        boolean isMoveValid = true;
+                        if (step == 2) {
+                            int midX = current.getX() + dx;
+                            int midY = current.getY() + dy;
+                            // Промежуточная клетка должна быть проходима (не стена)
+                            if (!maze.isPassable(midX, midY)) {
+                                isMoveValid = false;
+                            }
+                        }
+
+                        // 3. Если движение допустимо и конечная клетка проходима и не посещена
+                        if (isMoveValid && maze.isPassable(newX, newY) && !visited.contains(neighbor)) {
+                            stack.push(neighbor);
+                            visited.add(neighbor);
+                            parentMap.put(neighbor, current);
+                        }
                     }
                 }
             }
@@ -77,6 +93,6 @@ public class DepthFirstSearch implements PathFindingAlgorithm {
 
     @Override
     public String toString() {
-        return "Поиск в глубину (DFS)";
+        return "Поиск в глубину (DFS) с двойным шагом";
     }
 }
