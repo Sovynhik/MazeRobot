@@ -19,6 +19,29 @@ public class Maze {
         placeRobotAndTreasure();
     }
 
+    /**
+     * Устанавливает, является ли клетка проходимой (EMPTY) или непроходимой (WALL).
+     * Это необходимо для гарантирования проходимости стартовой и целевой точек.
+     * @param x Координата X.
+     * @param y Координата Y.
+     * @param isPassable true, если клетка должна быть EMPTY; false, если WALL.
+     */
+    public void setCellPassable(int x, int y, boolean isPassable) {
+        // Добавьте проверку границ для безопасности
+        if (x >= 0 && x < getWidth() && y >= 0 && y < getHeight()) {
+            // Если вы используете CellType.TREASURE для цели,
+            // этот код гарантирует, что она будет пустой или кладом.
+            if (isPassable) {
+                // Если клетка — цель, не затирайте её как EMPTY
+                if (grid[y][x] != CellType.TREASURE) {
+                    this.grid[y][x] = CellType.EMPTY;
+                }
+            } else {
+                this.grid[y][x] = CellType.WALL;
+            }
+        }
+    }
+
     private void initializeMaze() {
         // Сначала заполняем все клетки как пустые
         for (int y = 0; y < height; y++) {
