@@ -24,7 +24,7 @@ public class MazeView extends JFrame implements Listener {
     public MazeView(MazeModel maze, RobotModel robot, PathFindingManager pathMgr) {
         this.pathMgr = pathMgr;
         panel = new MazePanel(maze, robot);
-        setTitle("Робот в лабиринте - Строгий MVC с расширяемыми алгоритмами");
+        setTitle("Робот в лабиринте");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         add(panel, BorderLayout.CENTER);

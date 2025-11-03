@@ -6,7 +6,7 @@ import ru.rsreu.savushkin.mazerobot.core.entity.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RobotModel implements Model {
+public class RobotModel {
     private Point position;
     private final MazeModel maze;
     private final List<Listener> listeners = new ArrayList<>();
@@ -15,9 +15,6 @@ public class RobotModel implements Model {
         this.maze = maze;
         this.position = maze.getRobotStart();
     }
-
-    @Override
-    public void moveBall() {}
 
     public boolean move(int dx, int dy) {
         int nx = position.x() + dx, ny = position.y() + dy;
