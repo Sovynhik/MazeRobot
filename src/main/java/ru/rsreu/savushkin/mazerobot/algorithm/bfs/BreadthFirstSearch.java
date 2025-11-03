@@ -1,4 +1,4 @@
-package ru.rsreu.savushkin.mazerobot.algorithm.dfs;
+package ru.rsreu.savushkin.mazerobot.algorithm.bfs; // или ru.rsreu.savushkin.mazerobot.algorithm
 
 import ru.rsreu.savushkin.mazerobot.algorithm.pathfinding.PathFindingAlgorithm;
 import ru.rsreu.savushkin.mazerobot.core.entity.Maze;
@@ -6,18 +6,18 @@ import ru.rsreu.savushkin.mazerobot.core.entity.Point;
 
 import java.util.*;
 
-public class DepthFirstSearch implements PathFindingAlgorithm {
+public class BreadthFirstSearch implements PathFindingAlgorithm {
 
     @Override
     public List<Point> findPath(Maze maze, int startX, int startY, int endX, int endY) {
         Set<Point> visited = new HashSet<>();
-        Deque<Point> stack = new ArrayDeque<>();
+        Queue<Point> queue = new ArrayDeque<>(); // Используем Queue для BFS
         Map<Point, Point> parentMap = new HashMap<>();
 
         Point start = new Point(startX, startY);
         Point end = new Point(endX, endY);
 
-        stack.push(start);
+        queue.offer(start); // Добавляем в очередь
         visited.add(start);
         parentMap.put(start, null);
 
@@ -26,8 +26,8 @@ public class DepthFirstSearch implements PathFindingAlgorithm {
         // Возможные размеры шага: 1 и 2 клетки
         int[] steps = {1, 2};
 
-        while (!stack.isEmpty()) {
-            Point current = stack.pop();
+        while (!queue.isEmpty()) {
+            Point current = queue.poll(); // Извлекаем из очереди
 
             // Если достигли цели, восстанавливаем путь
             if (current.equals(end)) {
@@ -45,7 +45,7 @@ public class DepthFirstSearch implements PathFindingAlgorithm {
 
                     Point neighbor = new Point(newX, newY);
 
-                    // 1. Проверяем, что цель находится в пределах лабиринта
+                    // 1. Проверяем границы лабиринта
                     if (newX >= 0 && newX < maze.getWidth() && newY >= 0 && newY < maze.getHeight()) {
 
                         // 2. Дополнительная проверка для шага в 2 клетки: промежуточная клетка должна быть проходима
@@ -53,7 +53,7 @@ public class DepthFirstSearch implements PathFindingAlgorithm {
                         if (step == 2) {
                             int midX = current.getX() + dx;
                             int midY = current.getY() + dy;
-                            // Промежуточная клетка должна быть проходима (не стена)
+                            // Промежуточная клетка не должна быть стеной
                             if (!maze.isPassable(midX, midY)) {
                                 isMoveValid = false;
                             }
@@ -61,7 +61,8 @@ public class DepthFirstSearch implements PathFindingAlgorithm {
 
                         // 3. Если движение допустимо и конечная клетка проходима и не посещена
                         if (isMoveValid && maze.isPassable(newX, newY) && !visited.contains(neighbor)) {
-                            stack.push(neighbor);
+                            // Для BFS добавляем в очередь
+                            queue.offer(neighbor);
                             visited.add(neighbor);
                             parentMap.put(neighbor, current);
                         }
@@ -75,7 +76,7 @@ public class DepthFirstSearch implements PathFindingAlgorithm {
     }
 
     /**
-     * Восстанавливает путь от конечной точки до начальной
+     * Восстанавливает путь от конечной точки до начальной (та же логика, что и в DFS)
      */
     private List<Point> reconstructPath(Map<Point, Point> parentMap, Point end) {
         List<Point> path = new ArrayList<>();
@@ -86,13 +87,12 @@ public class DepthFirstSearch implements PathFindingAlgorithm {
             current = parentMap.get(current);
         }
 
-        // Переворачиваем, чтобы путь был от начала до конца
         Collections.reverse(path);
         return path;
     }
 
     @Override
     public String toString() {
-        return "Поиск в глубину (DFS) с двойным шагом";
+        return "Поиск в ширину (BFS) с двойным шагом";
     }
 }
