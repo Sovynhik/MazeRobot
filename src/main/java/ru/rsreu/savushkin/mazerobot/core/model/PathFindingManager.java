@@ -2,7 +2,9 @@ package ru.rsreu.savushkin.mazerobot.core.model;
 
 import ru.rsreu.savushkin.mazerobot.core.algorithm.PathFindingAlgorithm;
 import ru.rsreu.savushkin.mazerobot.core.algorithm.bfs.BreadthFirstSearch;
+import ru.rsreu.savushkin.mazerobot.core.algorithm.bfs.BreadthFirstSearchWithJumps;
 import ru.rsreu.savushkin.mazerobot.core.algorithm.dfs.DepthFirstSearch;
+import ru.rsreu.savushkin.mazerobot.core.algorithm.dfs.DepthFirstSearchWithJumps;
 import ru.rsreu.savushkin.mazerobot.core.entity.Point;
 
 import java.lang.reflect.InvocationTargetException;
@@ -15,6 +17,8 @@ public class PathFindingManager {
     public PathFindingManager() {
         registerAlgorithm("Поиск в глубину (DFS)", DepthFirstSearch.class);
         registerAlgorithm("Поиск в ширину (BFS)", BreadthFirstSearch.class);
+        registerAlgorithm("DFS с двойными ходами", DepthFirstSearchWithJumps.class);
+        registerAlgorithm("BFS с двойными ходами", BreadthFirstSearchWithJumps.class);
         try {
             currentAlgorithm = algorithmRegistry.values().iterator().next().getDeclaredConstructor().newInstance();
         } catch (Exception e) {
