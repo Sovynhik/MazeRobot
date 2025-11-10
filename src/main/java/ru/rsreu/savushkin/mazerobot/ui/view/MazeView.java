@@ -15,8 +15,14 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Главное окно приложения
+ *
+ * Отображает лабиринт, панель управления, анимирует найденный путь
+ * и показывает сообщения о результатах.
+ */
 public class MazeView extends JFrame implements Listener {
-    private final MazePanel panel;
+    private final MazePanel mazePanel;
     private final JButton startButton = new JButton("Начать игру");
     private final JButton findPathButton = new JButton("Найти путь");
     private final JComboBox<String> algorithmComboBox;
@@ -27,13 +33,13 @@ public class MazeView extends JFrame implements Listener {
     public MazeView(MazeModel maze, RobotModel robot, PathFindingManager pathMgr) {
         this.model = robot;
         this.pathMgr = pathMgr;
-        this.panel = new MazePanel(maze, robot);
+        this.mazePanel = new MazePanel(maze, robot);
 
         setTitle("Робот в лабиринте");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Устанавливаем только пользовательскую иконку (без дефолтного пингвина)
+        // Установка иконок приложения
         try {
             List<Image> icons = List.of(
                     new ImageIcon(getClass().getResource("/icons/robot16.png")).getImage(),
@@ -42,12 +48,12 @@ public class MazeView extends JFrame implements Listener {
             );
             setIconImages(icons);
         } catch (Exception e) {
-            System.err.println("⚠️ Не удалось загрузить иконки приложения: " + e.getMessage());
+            System.err.println("Не удалось загрузить иконки: " + e.getMessage());
         }
 
-        add(panel, BorderLayout.CENTER);
+        add(mazePanel, BorderLayout.CENTER);
 
-        // Панель управления снизу
+        // Панель управления
         algorithmComboBox = new JComboBox<>(pathMgr.getAvailableAlgorithms().toArray(new String[0]));
         JPanel controlPanel = new JPanel();
         controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.X_AXIS));
@@ -61,7 +67,6 @@ public class MazeView extends JFrame implements Listener {
         findPathButton.setEnabled(false);
         algorithmComboBox.setEnabled(false);
 
-        // Центрируем кнопки
         controlPanel.add(Box.createHorizontalGlue());
         controlPanel.add(startButton);
         controlPanel.add(Box.createRigidArea(new Dimension(10, 0)));
@@ -74,11 +79,10 @@ public class MazeView extends JFrame implements Listener {
 
         add(controlPanel, BorderLayout.SOUTH);
 
-        // 🔹 Подгоняем окно под ширину поля
+        // Подгонка окна под размер лабиринта
         pack();
-        int panelWidth = panel.getPreferredSize().width;
+        int panelWidth = mazePanel.getPreferredSize().width;
         controlPanel.setPreferredSize(new Dimension(panelWidth, controlPanel.getPreferredSize().height));
-
         pack();
         setResizable(false);
         setLocationRelativeTo(null);
@@ -88,17 +92,20 @@ public class MazeView extends JFrame implements Listener {
         this.controller = controller;
     }
 
+    /** Включает/выключает элементы управления игрой */
     public void enableGameControls(boolean enable) {
         startButton.setEnabled(!enable);
         findPathButton.setEnabled(enable);
         algorithmComboBox.setEnabled(enable);
-        panel.requestFocusInWindow();
+        mazePanel.requestFocusInWindow();
     }
 
+    /** Запускает анимацию найденного пути */
     public void showPath(List<Point> path) {
         animatePath(path);
     }
 
+    /** Анимация пути с задержкой */
     private void animatePath(List<Point> path) {
         if (path.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Путь не найден!", "Результат поиска", JOptionPane.WARNING_MESSAGE);
@@ -111,7 +118,7 @@ public class MazeView extends JFrame implements Listener {
             @Override
             public void run() {
                 if (index[0] < path.size()) {
-                    panel.updatePath(path.subList(0, index[0] + 1));
+                    mazePanel.updatePath(path.subList(0, index[0] + 1));
                     index[0]++;
                 } else {
                     timer.cancel();
@@ -127,6 +134,7 @@ public class MazeView extends JFrame implements Listener {
         }, 0, 200);
     }
 
+    /** Показывает сообщение о победе */
     public void showVictory() {
         JOptionPane.showMessageDialog(
                 this,
@@ -137,11 +145,11 @@ public class MazeView extends JFrame implements Listener {
     }
 
     public void addKeyListener(KeyListener listener) {
-        panel.addKeyListener(listener);
+        mazePanel.addKeyListener(listener);
     }
 
     @Override
     public void handle(Event event) {
-        panel.repaint();
+        mazePanel.repaint();
     }
 }

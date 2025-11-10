@@ -6,7 +6,24 @@ import ru.rsreu.savushkin.mazerobot.core.model.MazeModel;
 
 import java.util.*;
 
+/**
+ * Алгоритм поиска в глубину (DFS)
+ *
+ * Исследует лабиринт, углубляясь по каждому пути до конца, затем возвращается.
+ * Использует только одиночные шаги.
+ */
 public class DepthFirstSearch implements PathFindingAlgorithm {
+
+    /**
+     * Находит путь от начала до конца с помощью DFS
+     *
+     * @param maze лабиринт
+     * @param startX начальная X
+     * @param startY начальная Y
+     * @param endX конечная X
+     * @param endY конечная Y
+     * @return найденный путь
+     */
     @Override
     public List<Point> findPath(MazeModel maze, int startX, int startY, int endX, int endY) {
         Set<Point> visited = new HashSet<>();
@@ -20,21 +37,24 @@ public class DepthFirstSearch implements PathFindingAlgorithm {
         visited.add(start);
         parent.put(start, null);
 
-        int[][] dirs = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
+        int[][] directions = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
 
         while (!stack.isEmpty()) {
-            Point cur = stack.pop();
-            if (cur.equals(end)) return reconstructPath(parent, cur);
+            Point current = stack.pop();
+            if (current.equals(end)) {
+                return reconstructPath(parent, current);
+            }
 
-            for (int[] dir : dirs) {
-                int nx = cur.x() + dir[0];
-                int ny = cur.y() + dir[1];
-                if (nx >= 0 && nx < maze.getWidth() && ny >= 0 && ny < maze.getHeight()) {
-                    Point neighbor = new Point(nx, ny);
-                    if (maze.isPassable(nx, ny) && !visited.contains(neighbor)) {
+            for (int[] dir : directions) {
+                int nextX = current.x() + dir[0];
+                int nextY = current.y() + dir[1];
+
+                if (isWithinBounds(nextX, nextY, maze)) {
+                    Point neighbor = new Point(nextX, nextY);
+                    if (maze.isPassable(nextX, nextY) && !visited.contains(neighbor)) {
                         stack.push(neighbor);
                         visited.add(neighbor);
-                        parent.put(neighbor, cur);
+                        parent.put(neighbor, current);
                     }
                 }
             }
@@ -42,17 +62,23 @@ public class DepthFirstSearch implements PathFindingAlgorithm {
         return Collections.emptyList();
     }
 
+    private boolean isWithinBounds(int x, int y, MazeModel maze) {
+        return x >= 0 && x < maze.getWidth() && y >= 0 && y < maze.getHeight();
+    }
+
     private List<Point> reconstructPath(Map<Point, Point> parent, Point end) {
         List<Point> path = new ArrayList<>();
-        Point cur = end;
-        while (cur != null) {
-            path.add(cur);
-            cur = parent.get(cur);
+        Point current = end;
+        while (current != null) {
+            path.add(current);
+            current = parent.get(current);
         }
         Collections.reverse(path);
         return path;
     }
 
     @Override
-    public String getName() { return "Поиск в глубину (DFS)"; }
+    public String getName() {
+        return "Поиск в глубину (DFS)";
+    }
 }

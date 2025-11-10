@@ -1,3 +1,10 @@
 package ru.rsreu.savushkin.mazerobot.core.entity;
 
-public enum CellType { EMPTY, WALL, ROBOT, TREASURE, VISITED }
+/** Типы клеток лабиринта */
+public enum CellType {
+    EMPTY,      // пустая клетка
+    WALL,       // стена
+    ROBOT,      // позиция робота (внутреннее)
+    TREASURE,   // сокровище
+    VISITED     // посещённая клетка (для алгоритмов)
+}
