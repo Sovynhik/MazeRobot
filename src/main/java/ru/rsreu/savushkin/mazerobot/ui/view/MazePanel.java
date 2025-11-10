@@ -9,12 +9,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Панель отрисовки лабиринта
+ *
+ * Отвечает за визуальное представление лабиринта, робота, пути и сокровища.
+ */
 public class MazePanel extends JPanel {
     private final MazeModel maze;
     private final RobotModel robot;
     private List<Point> path = List.of();
-
-    // 🔹 Увеличенный размер клетки для лучшего визуального баланса
     private static final int CELL_SIZE = 35;
     private static final Color WALL_COLOR = Color.DARK_GRAY;
     private static final Color EMPTY_COLOR = Color.WHITE;
@@ -31,6 +34,11 @@ public class MazePanel extends JPanel {
         setBackground(Color.WHITE);
     }
 
+    /**
+     * Обновляет отображаемый путь
+     *
+     * @param path новый путь для отрисовки
+     */
     public void updatePath(List<Point> path) {
         this.path = path;
         repaint();
@@ -41,7 +49,7 @@ public class MazePanel extends JPanel {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
 
-        // Лёгкий фон с градиентом
+        // Фон с лёгким градиентом
         g2d.setPaint(new GradientPaint(0, 0, Color.LIGHT_GRAY, getWidth(), getHeight(), Color.WHITE));
         g2d.fillRect(0, 0, getWidth(), getHeight());
 
@@ -53,7 +61,7 @@ public class MazePanel extends JPanel {
                 Color color;
 
                 if (x == 0 || y == 0 || x == maze.getWidth() - 1 || y == maze.getHeight() - 1) {
-                    color = BORDER_COLOR;
+                    color = BORDER_COLOR; // внешняя рамка
                 } else {
                     CellType cell = maze.getCell(x, y);
                     color = switch (cell) {
@@ -70,18 +78,16 @@ public class MazePanel extends JPanel {
             }
         }
 
-        // Путь (следы)
+        // Отрисовка пути (зелёные круги)
         g2d.setColor(PATH_COLOR);
         for (Point p : path) {
             int cx = p.x() * CELL_SIZE + 6;
             int cy = p.y() * CELL_SIZE + 6;
             int size = CELL_SIZE - 12;
-
-            // Круглый след
             g2d.fillOval(cx, cy, size, size);
         }
 
-        // Робот
+        // Отрисовка робота
         Point pos = robot.getPosition();
         g2d.setColor(ROBOT_COLOR);
         g2d.fillOval(pos.x() * CELL_SIZE + 5, pos.y() * CELL_SIZE + 5, CELL_SIZE - 10, CELL_SIZE - 10);
